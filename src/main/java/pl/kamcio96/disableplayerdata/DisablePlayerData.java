@@ -15,11 +15,9 @@ public class DisablePlayerData extends JavaPlugin implements InvocationHandler {
     @Override
     public void onEnable() {
 
-        String ver = Bukkit.getServer().getClass().getName().split("\\.")[3];
-
-        getLogger().info(ver);
-
         try {
+            String ver = Bukkit.getServer().getClass().getName().split("\\.")[3];
+
             Class<?> clazz = Class.forName("net.minecraft.server." + ver + ".IPlayerFileData");
             Object proxyIPlayerFileData = Proxy.newProxyInstance(clazz.getClassLoader(), new Class[] { clazz }, this);
 
