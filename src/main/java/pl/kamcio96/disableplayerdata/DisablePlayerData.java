@@ -38,6 +38,9 @@ public class DisablePlayerData extends JavaPlugin implements InvocationHandler {
         if (method.getName().equals("load")) {
             return method.invoke(original, args);
         }
+        if (method.getName().equals("getSeenPlayers")) {
+            return method.invoke(original, args);
+        }
 
         return null;
     }
