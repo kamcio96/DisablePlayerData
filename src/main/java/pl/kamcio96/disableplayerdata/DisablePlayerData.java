@@ -56,7 +56,6 @@ public class DisablePlayerData extends JavaPlugin implements InvocationHandler {
             }
 
             Bukkit.getPluginManager().callEvent(event);
-            System.out.println(event.isCancelled());
             if (event.isCancelled()) {
                 return null;
             }
