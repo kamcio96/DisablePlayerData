@@ -1,6 +1,7 @@
 package pl.kamcio96.disableplayerdata;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
@@ -10,10 +11,18 @@ import java.lang.reflect.Proxy;
 
 public class DisablePlayerData extends JavaPlugin implements InvocationHandler {
 
+    public static final String PERMISSION = "disableplayerdata.forcesave";
+
     private Object original;
+    private Method getBukkitEntityMethod;
+
+    private boolean usePermission;
 
     @Override
     public void onEnable() {
+        saveDefaultConfig();
+
+        usePermission = getConfig().getBoolean("usePermission", false);
 
         try {
             String ver = Bukkit.getServer().getClass().getName().split("\\.")[3];
@@ -28,6 +37,8 @@ public class DisablePlayerData extends JavaPlugin implements InvocationHandler {
 
             original = f.get(playerList);
             f.set(playerList, proxyIPlayerFileData);
+
+            getBukkitEntityMethod = Class.forName("net.minecraft.server." + ver + ".EntityHuman").getMethod("getBukkitEntity");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -35,13 +46,21 @@ public class DisablePlayerData extends JavaPlugin implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (method.getName().equals("load")) {
-            return method.invoke(original, args);
-        }
-        if (method.getName().equals("getSeenPlayers")) {
-            return method.invoke(original, args);
-        }
+        if (method.getName().equals("save")) {
+            Object oPlayer = getBukkitEntityMethod.invoke(args[0]);
+            Player player = (Player) oPlayer;
+            SavePlayerEvent event = new SavePlayerEvent(player);
 
-        return null;
+            if (usePermission && player.hasPermission(PERMISSION)) {
+                event.setCancelled(false);
+            }
+
+            Bukkit.getPluginManager().callEvent(event);
+            System.out.println(event.isCancelled());
+            if (event.isCancelled()) {
+                return null;
+            }
+        }
+        return method.invoke(original, args);
     }
 }
