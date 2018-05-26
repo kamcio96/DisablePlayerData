@@ -7,7 +7,7 @@ import org.bukkit.event.player.PlayerEvent;
 
 public class SavePlayerEvent extends PlayerEvent implements Cancellable {
 
-    private static HandlerList handlerList = new HandlerList();
+    private final static HandlerList handlerList = new HandlerList();
 
     private boolean cancelled;
 
