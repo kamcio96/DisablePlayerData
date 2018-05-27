@@ -11,7 +11,7 @@ import java.lang.reflect.Proxy;
 
 public class DisablePlayerData extends JavaPlugin implements InvocationHandler {
 
-    public static final String PERMISSION = "disableplayerdata.forcesave";
+    private static final String PERMISSION = "disableplayerdata.forcesave";
 
     private Object original;
     private Method getBukkitEntityMethod;
@@ -60,6 +60,7 @@ public class DisablePlayerData extends JavaPlugin implements InvocationHandler {
                 return null;
             }
         }
+
         return method.invoke(original, args);
     }
 }
